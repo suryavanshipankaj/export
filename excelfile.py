@@ -6,12 +6,23 @@ st.title("Generate SQL Script from Excel File")
 
 # Upload Excel file
 
-inputExcelFile = st.sidebar.file_uploader("Upload Excel File", type=["xlsx", "xls"])
+#inputExcelFile = st.sidebar.file_uploader("Upload Excel File", type=["xlsx", "xls"])
 
-if inputExcelFile is not None:
+#if inputExcelFile is not None:
     # Read the uploaded Excel file
-    df = pd.read_excel(inputExcelFile)
+   # df = pd.read_excel(inputExcelFile)
 
+
+
+inputFile = st.sidebar.file_uploader("Upload Excel or CSV File", type=["xlsx", "xls", "csv"])
+
+if inputFile is not None:
+    try:
+        # Determine the file type and read the uploaded file
+        if inputFile.name.endswith('xlsx') or inputFile.name.endswith('xls'):
+            df = pd.read_excel(inputFile)
+        elif inputFile.name.endswith('csv'):
+            df = pd.read_csv(inputFile)
     # Map pandas dtypes to MySQL data types
     dtype_mapping = {
         'object': 'VARCHAR(255)',
