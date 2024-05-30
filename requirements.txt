@@ -8,4 +8,6 @@ pillow
 openpyxl
 streamlit-option-menu
 pyperclip
+openpyxl
+xlrd
 
