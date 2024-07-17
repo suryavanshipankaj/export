@@ -1,8 +1,9 @@
 import pandas as pd
 import streamlit as st
 from io import BytesIO
-
-st.title("Generate SQL Script from Excel or CSV File")
+st.set_page_config(page_title="Network", page_icon="🥷", layout="wide")
+st.title("Generate SQL Script from Excel or CSV File 📜")
+#st.title("Generate SQL Script from Excel or CSV File")
 
 # Upload Excel or CSV file
 inputFile = st.sidebar.file_uploader("Upload Excel or CSV File", type=["xlsx", "xls", "csv"])
