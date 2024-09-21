@@ -5,34 +5,35 @@ from io import BytesIO
 # Set up the page configuration
 st.set_page_config(page_title="SQL Script Generator", page_icon="🥷", layout="wide")
 
-# Page title and description
-st.title("Generate SQL Script from Excel or CSV File 📜")
-st.write("Upload an Excel or CSV file and generate a SQL `CREATE TABLE` and `INSERT INTO` script automatically.")
+# Add some color to the title using Markdown
+st.markdown("<h1 style='text-align: center; color: #4CAF50;'>Generate SQL Script from Excel or CSV File 📜</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #555;'>Easily convert your Excel or CSV data into SQL CREATE and INSERT scripts!</p>", unsafe_allow_html=True)
 
 # Sidebar for file upload
-st.sidebar.header("Upload your file 📂")
-inputFile = st.sidebar.file_uploader("Upload Excel or CSV File", type=["xlsx", "xls", "csv"])
+st.sidebar.markdown("<h3 style='color: #FF6347;'>Upload Your File 📂</h3>", unsafe_allow_html=True)
+inputFile = st.sidebar.file_uploader("Choose an Excel or CSV file", type=["xlsx", "xls", "csv"])
 
-# Custom table name input
-table_name = st.sidebar.text_input("Enter Table Name", value="table_name")
+# Sidebar for custom table name
+st.sidebar.markdown("<h4 style='color: #1E90FF;'>Enter Table Name:</h4>", unsafe_allow_html=True)
+table_name = st.sidebar.text_input("", value="table_name")
 
 # Check if a file has been uploaded
 if inputFile is not None:
     try:
         # Display file info and loading spinner
-        with st.spinner("Processing the file..."):
+        with st.spinner("Processing your file..."):
             # Determine file type and read the file
             if inputFile.name.endswith(('xlsx', 'xls')):
                 df = pd.read_excel(inputFile)
             elif inputFile.name.endswith('csv'):
                 df = pd.read_csv(inputFile)
 
-        # Display a preview of the uploaded data
-        st.subheader("Preview of Uploaded Data 📊")
+        # Display a preview of the uploaded data with colored section header
+        st.markdown("<h2 style='color: #FF6347;'>📊 Data Preview</h2>", unsafe_allow_html=True)
         st.dataframe(df.head(10))  # Show the first 10 rows for preview
         
         # Add a checkbox to allow users to show the entire dataset
-        if st.checkbox("Show Full Dataset"):
+        if st.checkbox("Show Full Dataset", help="Expand to view the full dataset"):
             st.dataframe(df)
 
         # Map pandas dtypes to MySQL data types
@@ -63,8 +64,8 @@ if inputFile is not None:
         # Combine the SQL statements
         sql_script = create_table_statement + "\n\n" + insert_statement
 
-        # Display the generated SQL script
-        st.subheader("Generated SQL Script 🧾")
+        # Display the generated SQL script with color
+        st.markdown("<h2 style='color: #4CAF50;'>🧾 Generated SQL Script</h2>", unsafe_allow_html=True)
         st.code(sql_script, language="sql")
 
         # Function to convert SQL content to a downloadable file
@@ -77,15 +78,14 @@ if inputFile is not None:
         # Create a downloadable link for the SQL file
         b = create_download_link(sql_script)
         st.download_button(
-            label="Download SQL File 📥",
+            label="📥 Download SQL File",
             data=b,
             file_name=f"{table_name}.sql",
             mime="text/sql"
         )
 
     except Exception as e:
-        # Display error message if something goes wrong
+        # Display error message if something goes wrong with color
         st.error(f"Error processing the file: {e}")
 else:
     st.info("Please upload an Excel or CSV file to get started.")
-
