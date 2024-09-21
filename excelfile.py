@@ -1,20 +1,39 @@
 import pandas as pd
 import streamlit as st
 from io import BytesIO
-st.set_page_config(page_title="Network", page_icon="🥷", layout="wide")
-st.title("Generate SQL Script from Excel or CSV File 📜")
-#st.title("Generate SQL Script from Excel or CSV File")
 
-# Upload Excel or CSV file
+# Set up the page configuration
+st.set_page_config(page_title="SQL Script Generator", page_icon="🥷", layout="wide")
+
+# Page title and description
+st.title("Generate SQL Script from Excel or CSV File 📜")
+st.write("Upload an Excel or CSV file and generate a SQL `CREATE TABLE` and `INSERT INTO` script automatically.")
+
+# Sidebar for file upload
+st.sidebar.header("Upload your file 📂")
 inputFile = st.sidebar.file_uploader("Upload Excel or CSV File", type=["xlsx", "xls", "csv"])
 
+# Custom table name input
+table_name = st.sidebar.text_input("Enter Table Name", value="table_name")
+
+# Check if a file has been uploaded
 if inputFile is not None:
     try:
-        # Determine the file type and read the uploaded file
-        if inputFile.name.endswith('xlsx') or inputFile.name.endswith('xls'):
-            df = pd.read_excel(inputFile)
-        elif inputFile.name.endswith('csv'):
-            df = pd.read_csv(inputFile)
+        # Display file info and loading spinner
+        with st.spinner("Processing the file..."):
+            # Determine file type and read the file
+            if inputFile.name.endswith(('xlsx', 'xls')):
+                df = pd.read_excel(inputFile)
+            elif inputFile.name.endswith('csv'):
+                df = pd.read_csv(inputFile)
+
+        # Display a preview of the uploaded data
+        st.subheader("Preview of Uploaded Data 📊")
+        st.dataframe(df.head(10))  # Show the first 10 rows for preview
+        
+        # Add a checkbox to allow users to show the entire dataset
+        if st.checkbox("Show Full Dataset"):
+            st.dataframe(df)
 
         # Map pandas dtypes to MySQL data types
         dtype_mapping = {
@@ -26,27 +45,27 @@ if inputFile is not None:
         }
 
         # Generate the CREATE TABLE statement
-        table_name = "table_name"
         columns_with_types = []
         for column, dtype in zip(df.columns, df.dtypes):
             sql_type = dtype_mapping.get(str(dtype), 'VARCHAR(255)')
-            columns_with_types.append(f"{column} {sql_type}")
-        create_table_statement = f"CREATE TABLE {table_name} (\n" + ",\n".join(columns_with_types) + "\n);"
+            columns_with_types.append(f"`{column}` {sql_type}")
+        create_table_statement = f"CREATE TABLE `{table_name}` (\n" + ",\n".join(columns_with_types) + "\n);"
 
         # Generate the INSERT INTO statement
-        columns = ', '.join(df.columns)
+        columns = ', '.join([f"`{col}`" for col in df.columns])
         values_list = []
         for _, row in df.iterrows():
-            values = ', '.join([f"'{value}'" for value in row.values])
+            values = ', '.join([f"'{value}'" if pd.notna(value) else "NULL" for value in row.values])
             values_list.append(f"({values})")
         values_str = ',\n'.join(values_list)
-        insert_statement = f"INSERT INTO {table_name} ({columns}) VALUES\n{values_str};"
+        insert_statement = f"INSERT INTO `{table_name}` ({columns}) VALUES\n{values_str};"
 
-        # Combine both statements
+        # Combine the SQL statements
         sql_script = create_table_statement + "\n\n" + insert_statement
 
         # Display the generated SQL script
-        st.code(sql_script)
+        st.subheader("Generated SQL Script 🧾")
+        st.code(sql_script, language="sql")
 
         # Function to convert SQL content to a downloadable file
         def create_download_link(sql_content):
@@ -58,11 +77,15 @@ if inputFile is not None:
         # Create a downloadable link for the SQL file
         b = create_download_link(sql_script)
         st.download_button(
-            label="Download SQL File",
+            label="Download SQL File 📥",
             data=b,
-            file_name="script.sql",
+            file_name=f"{table_name}.sql",
             mime="text/sql"
         )
+
     except Exception as e:
+        # Display error message if something goes wrong
         st.error(f"Error processing the file: {e}")
+else:
+    st.info("Please upload an Excel or CSV file to get started.")
 
