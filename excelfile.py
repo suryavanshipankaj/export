@@ -89,3 +89,5 @@ if inputFile is not None:
         st.error(f"Error processing the file: {e}")
 else:
     st.info("Please upload an Excel or CSV file to get started.")
+
+st.markdown("<p style='text-align: center; color: #555;'>Maintain By Pankaj Suryavanshi!</p>", unsafe_allow_html=True)
