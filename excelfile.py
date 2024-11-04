@@ -16,7 +16,6 @@ inputFile = st.sidebar.file_uploader("Choose an Excel or CSV file", type=["xlsx"
 # Sidebar for custom table name
 st.sidebar.markdown("<h4 style='color: #1E90FF;'>Enter Table Name:</h4>", unsafe_allow_html=True)
 table_name = st.sidebar.text_input("", value="table_name")
-st.sidebar.markdown("<p style='text-align: center; color: #555;'>Maintain By Pankaj Suryavanshi!</p>", unsafe_allow_html=True)
 
 # Check if a file has been uploaded
 if inputFile is not None:
@@ -90,4 +89,4 @@ if inputFile is not None:
         st.error(f"Error processing the file: {e}")
 else:
     st.info("Please upload an Excel or CSV file to get started.")
-
+st.sidebar.markdown("<p style='text-align: center; color: #555;'>Maintain By :- Pankaj Suryavanshi!</p>", unsafe_allow_html=True)
